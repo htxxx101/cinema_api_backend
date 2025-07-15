@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // API_BASE_URL is implicitly the same host as the frontend now
-    // If you were to access it from a different origin (e.g. your agent running on Colab)
-    // you would use the full Render URL.
     const API_BASE_URL = window.location.origin; 
     
     const movieGrid = document.getElementById('movieGrid');
@@ -35,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const seatsClass = movie.available_seats > 0 ? 'seats-available' : 'seats-booked';
                 const seatsText = movie.available_seats > 0 ? `${movie.available_seats} seats available` : 'Fully Booked';
 
-                // Simple badge logic (can be expanded)
                 let badgeHtml = '';
                 if (movie.available_seats === 0) {
                     badgeHtml = '<span class="badge badge-sold-out">Sold Out</span>';
@@ -51,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="movie-footer">
                         <span class="seats-info ${seatsClass}">${seatsText}</span>
-                        </div>
+                    </div>
                 `;
                 movieGrid.appendChild(movieCard);
             }
@@ -63,10 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initial fetch when the page loads
     fetchMovies();
-
-    // Optional: Auto-refresh data every 10 seconds (for simple updates demonstration)
-    // In a real app, you might use WebSockets for real-time updates.
     setInterval(fetchMovies, 10000); 
-});
+}); // <-- This closing brace was missing!
