@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awesome Cinema</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <h1>🐱 Meow Cinema 🍿</h1>
+    </div>
+
+    <div class="container">
+        <div class="loading-spinner" id="loadingSpinner"></div>
+        <div class="error-message" id="errorMessage" style="display:none;"></div>
+        
+        <div id="movieGrid" class="movie-grid">
+            </div>
+
+        <p class="footer-note">Seats are in-memory and reset on server restart.</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
