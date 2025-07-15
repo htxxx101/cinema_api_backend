@@ -1,11 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app) 
 
-#mock database for movie information
-# This will be in-memory and reset every time the server restarts.
 movie_data = {
     "Dune: Part One": {
         "show_time": "7:00 PM",
@@ -17,7 +15,7 @@ movie_data = {
     },
     "Mission Impossible - Dead Reckoning Part One": {
         "show_time": "3:00 PM",
-        "available_seats": 0 # Fully booked for demonstration
+        "available_seats": 0
     },
     "James Bond: No Time to Die": {
         "show_time": "10:00 AM",
@@ -42,29 +40,15 @@ movie_data = {
 }
 
 @app.route('/')
-def home():
-    """A simple home route to confirm the server is running."""
-    return "Welcome to the Cinema Ticket API! Use /api/v1/movies to get movie info."
+def serve_frontend():
+    return render_template('index.html')
 
 @app.route('/api/v1/movies', methods=['GET'])
 def get_movies():
-    """
-    API endpoint to fetch all available movies, their showtimes, and available seats.
-    Returns:
-        JSON: A dictionary where keys are movie titles and values are their details.
-    """
     return jsonify(movie_data)
 
 @app.route('/api/v1/movies/<movie_title>/reserve', methods=['POST'])
 def reserve_tickets(movie_title):
-    """
-    API endpoint to reserve tickets for a specific movie.
-    Expects a JSON body with 'num_tickets':
-    {
-        "num_tickets": 3
-    }
-    """
-    # 1. Validate incoming JSON data
     if not request.is_json:
         return jsonify({"error": "Request must be JSON"}), 400
     
@@ -74,8 +58,6 @@ def reserve_tickets(movie_title):
     if num_tickets is None or not isinstance(num_tickets, int) or num_tickets <= 0:
         return jsonify({"error": "Invalid number of tickets. Must be a positive integer."}), 400
 
-    #  Normalize movie title for lookup (handle potential casing/spacing issues)
-    #  try to find a matching movie title case-insensitively.
     found_movie_title = None
     for title_key in movie_data:
         if title_key.lower() == movie_title.lower():
@@ -85,7 +67,6 @@ def reserve_tickets(movie_title):
     if found_movie_title is None:
         return jsonify({"error": f"Movie '{movie_title}' not found."}), 404
 
-    #  Process reservation
     movie_info = movie_data[found_movie_title]
     current_available_seats = movie_info["available_seats"]
     showtime = movie_info["show_time"]
@@ -96,10 +77,9 @@ def reserve_tickets(movie_title):
             "reserved": False,
             "movie_title": found_movie_title,
             "show_time": showtime,
-            "available_seats": current_available_seats # Show current state
-        }), 409 # 409 Conflict indicates a conflict with the current state of the resource
+            "available_seats": current_available_seats
+        }), 409
 
-    # If enough seats, proceed with reservation
     movie_info["available_seats"] -= num_tickets
     new_available_seats = movie_info["available_seats"]
 
@@ -110,8 +90,7 @@ def reserve_tickets(movie_title):
         "show_time": showtime,
         "tickets_reserved": num_tickets,
         "remaining_seats": new_available_seats
-    }), 200 # 200 OK for success
+    }), 200
 
-#run this file to start the Flask development server
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
